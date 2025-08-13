@@ -6,11 +6,24 @@ export interface Post {
   id: number
   title: string
   content: string
+  published?: boolean
   createdAt: string
   updatedAt: string
   author: {
     name: string
   } | null
+}
+
+export interface CreatePostData {
+  title: string
+  content: string
+  published?: boolean
+}
+
+export interface UpdatePostData {
+  title?: string
+  content?: string
+  published?: boolean
 }
 
 export interface Comment {
@@ -60,6 +73,160 @@ export const postService = {
     } catch (error) {
       console.error('Error fetching post:', error)
       throw new Error('Unable to fetch post. Please try again later.')
+    }
+  },
+
+  // Get all unpublished posts (requires AUTHOR role)
+  async getUnpublishedPosts(): Promise<Post[]> {
+    const authStore = useAuthStore()
+
+    if (!authStore.token) {
+      throw new Error('Authentication required to view unpublished posts')
+    }
+
+    try {
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.POSTS.UNPUBLISHED), {
+        headers: {
+          'Authorization': `Bearer ${authStore.token}`
+        }
+      })
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Please log in to view unpublished posts')
+        }
+        if (response.status === 403) {
+          throw new Error('Only authors can view unpublished posts')
+        }
+        throw new Error('Failed to fetch unpublished posts')
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Error fetching unpublished posts:', error)
+      if (error instanceof Error) {
+        throw error
+      }
+      throw new Error('Unable to fetch unpublished posts. Please try again later.')
+    }
+  },
+
+  // Create a new post (requires AUTHOR role)
+  async createPost(postData: CreatePostData): Promise<Post> {
+    const authStore = useAuthStore()
+
+    if (!authStore.token) {
+      throw new Error('Authentication required to create posts')
+    }
+
+    try {
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.POSTS.CREATE), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authStore.token}`
+        },
+        body: JSON.stringify(postData)
+      })
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Please log in to create posts')
+        }
+        if (response.status === 403) {
+          throw new Error('Only authors can create posts')
+        }
+        if (response.status === 400) {
+          throw new Error('Invalid post data')
+        }
+        throw new Error('Failed to create post')
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Error creating post:', error)
+      if (error instanceof Error) {
+        throw error
+      }
+      throw new Error('Unable to create post. Please try again later.')
+    }
+  },
+
+  // Update a post (requires authentication and ownership)
+  async updatePost(id: number, postData: UpdatePostData): Promise<Post> {
+    const authStore = useAuthStore()
+
+    if (!authStore.token) {
+      throw new Error('Authentication required to update posts')
+    }
+
+    try {
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.POSTS.UPDATE(id)), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authStore.token}`
+        },
+        body: JSON.stringify(postData)
+      })
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Please log in to update posts')
+        }
+        if (response.status === 403) {
+          throw new Error('You can only update your own posts')
+        }
+        if (response.status === 404) {
+          throw new Error('Post not found')
+        }
+        throw new Error('Failed to update post')
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Error updating post:', error)
+      if (error instanceof Error) {
+        throw error
+      }
+      throw new Error('Unable to update post. Please try again later.')
+    }
+  },
+
+  // Delete a post (requires authentication and ownership)
+  async deletePost(id: number): Promise<void> {
+    const authStore = useAuthStore()
+
+    if (!authStore.token) {
+      throw new Error('Authentication required to delete posts')
+    }
+
+    try {
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.POSTS.DELETE(id)), {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${authStore.token}`
+        }
+      })
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Please log in to delete posts')
+        }
+        if (response.status === 403) {
+          throw new Error('You can only delete your own posts')
+        }
+        if (response.status === 404) {
+          throw new Error('Post not found')
+        }
+        throw new Error('Failed to delete post')
+      }
+    } catch (error) {
+      console.error('Error deleting post:', error)
+      if (error instanceof Error) {
+        throw error
+      }
+      throw new Error('Unable to delete post. Please try again later.')
     }
   },
 

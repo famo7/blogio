@@ -8,7 +8,11 @@ export const API_CONFIG = {
     },
     POSTS: {
       ALL: '/posts',
+      UNPUBLISHED: '/posts/unpublished/all',
       BY_ID: (id: number) => `/posts/${id}`,
+      CREATE: '/posts',
+      UPDATE: (id: number) => `/posts/${id}`,
+      DELETE: (id: number) => `/posts/${id}`,
       COMMENTS: (postId: number) => `/posts/${postId}/comments`,
       COMMENT_BY_ID: (postId: number, commentId: number) => `/posts/${postId}/comments/${commentId}`,
     },

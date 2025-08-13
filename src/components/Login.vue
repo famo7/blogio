@@ -169,11 +169,11 @@ const handleSubmit = async () => {
 
   try {
     await authService.login(formData.value)
-    success.value = 'Login successful! Welcome back.'
+    success.value = 'Login successful! Redirecting to blog...'
 
-    // Redirect to home page after successful login
+    // Redirect to blog page after successful login
     setTimeout(() => {
-      router.push('/')
+      router.push('/blog')
     }, 1500)
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Login failed. Please try again.'

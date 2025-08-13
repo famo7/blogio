@@ -4,9 +4,13 @@
       <div class="flex justify-between items-center h-16">
         <!-- Logo -->
         <div class="flex items-center">
-          <router-link to="/"
-            class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent hover:from-blue-700 hover:to-blue-900 transition-all duration-200">
-            Blogio
+          <router-link to="/" class="flex items-center space-x-2 group">
+            <img src="@/assets/images/Blogio.png" alt="Blogio Logo"
+              class="h-8 w-auto transition-transform duration-200 group-hover:scale-105" />
+            <span
+              class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent hover:from-blue-700 hover:to-blue-900 transition-all duration-200">
+              Blogio
+            </span>
           </router-link>
         </div>
 
